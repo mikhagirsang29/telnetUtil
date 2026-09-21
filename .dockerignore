@@ -1,0 +1,8 @@
+.env
+.git
+.gitignore
+README.md
+Dockerfile
+docker-compose.yml
+telnet-central
+telnet-central.exe

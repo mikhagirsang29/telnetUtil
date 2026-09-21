@@ -21,6 +21,35 @@ created automatically on startup from `schema.sql`.
 
 Build for Linux from any OS: `GOOS=linux GOARCH=amd64 go build -o telnet-central .`
 
+## Run with Docker
+
+```bash
+cp .env.example .env        # set DB_USER, DB_PASSWORD, DB_NAME (DB_PASSWORD is required)
+go mod tidy                 # once, so go.sum exists for the image build
+docker compose up -d --build
+docker compose logs -f api
+```
+
+This starts PostgreSQL (data in the `pgdata` volume) and the API on `http://localhost:8080`
+(change with `API_PORT`). Compose points the API at the `db` container by itself, so `DB_HOST`
+in `.env` is ignored under Docker and can stay `localhost` for `go run .`. Credentials in `.env`
+are used both to create the database and to connect to it.
+
+Useful commands:
+
+```bash
+docker compose ps                    # status and health
+docker compose down                  # stop, keep data
+docker compose down -v               # stop and DELETE the database volume
+docker compose up -d --build api     # rebuild after code changes
+```
+
+The agents are reached over your network from inside the container, so each agent IP must be
+routable from the Docker host. To test against an agent running on the Docker host itself,
+register the host's LAN IP, not `127.0.0.1` (inside the container that is the container).
+To use an external PostgreSQL instead, remove the `db` service and `depends_on`, and set
+`DB_HOST` for the `api` service.
+
 ## Configuration (.env)
 
 | Variable          | Default          | Meaning                                              |
